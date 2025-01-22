@@ -8,4 +8,8 @@ def parse_search_phrase(allowed_fields, phrase):
     :param phrase: The search phrase string.
     :return: A Q object representing the filters.
     """
-    pass
+
+    # tokenizing search phrases
+    token_pattern = re.compile(r'(\(|\)|\band\b|\bor\b|\w+\s(eq|ne|gt|lt)\s[^\s\)]+)', re.IGNORECASE)
+
+    

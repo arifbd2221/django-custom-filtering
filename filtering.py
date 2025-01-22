@@ -4,8 +4,14 @@ from django.db.models import Q
 
 
 class SearchParser:
+    """
+    A class to parse a search phrase into a Django Q object.
+    """
 
     def __init__(self, allowed_fields):
+        """
+        Initialize the parser with allowed fields.
+        """
         self.allowed_fields = allowed_fields
         self.operator_mapping = {
             'eq': '',       # Equals
@@ -15,8 +21,10 @@ class SearchParser:
         }
         self.token_pattern = re.compile(r'(\(|\)|\band\b|\bor\b|\w+\s(eq|ne|gt|lt)\s[^\s\)]+)', re.IGNORECASE)
     
-
     def evaluate_expression(self, expression):
+        """
+        Evaluates a single comparison expression into a Q object.
+        """
         field, operator, value = re.split(r'\s+', expression, 2)
 
         # Validate the field
@@ -31,6 +39,9 @@ class SearchParser:
         return Q(**{f"{field}{lookup}": value})
 
     def combine_q_objects(self, sub_q):
+        """
+        Combines a list of Q objects and operators into a single Q object.
+        """
         combined_q = sub_q.pop(0)
         while sub_q:
             operator = sub_q.pop(0)

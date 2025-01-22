@@ -25,6 +25,11 @@ class SearchParser:
         """
         Evaluates a single comparison expression into a Q object.
         """
+        # Ensure the expression has exactly three parts: field, operator, value
+        parts = re.split(r'\s+', expression)
+        if len(parts) != 3:
+            raise ValueError(f"Invalid expression: '{expression}'. Expected format: 'field operator value'.")
+        
         field, operator, value = re.split(r'\s+', expression, 2)
 
         # Validate the field
@@ -34,6 +39,18 @@ class SearchParser:
         # Map the operator to its Django ORM equivalent
         if operator.lower() not in self.operator_mapping:
             raise ValueError(f"Operator '{operator}' is not supported.")
+        
+        # Convert the value to an appropriate type
+        try:
+            if value.isdigit():
+                value = int(value)
+            else:
+                try:
+                    value = float(value)
+                except ValueError:
+                    pass  # Keep it as a string if it's not a number
+        except Exception as e:
+            raise ValueError(f"Invalid value '{value}': {str(e)}")
 
         lookup = self.operator_mapping[operator.lower()]
         return Q(**{f"{field}{lookup}": value})
@@ -59,6 +76,9 @@ class SearchParser:
         tokens = self.token_pattern.findall(phrase)
         tokens = [t[0] if isinstance(t, tuple) else t for t in tokens]
 
+        if not tokens:
+            raise ValueError("Empty or invalid search phrase.")
+
         stack = []
         for token in tokens:
             token = token.strip().lower()
@@ -69,6 +89,7 @@ class SearchParser:
                 sub_q = []
                 while stack and stack[-1] != '(':
                     sub_q.insert(0, stack.pop())
+
                 stack.pop()  # Remove the '('
                 combined_q = self.combine_q_objects(sub_q)
                 stack.append(combined_q)
@@ -77,6 +98,9 @@ class SearchParser:
                 stack.append(token)
             else:
                 stack.append(self.evaluate_expression(token))
+        
+        if not stack:
+            raise ValueError("Empty or invalid search phrase.")
         
         return self.combine_q_objects(stack)
 

@@ -17,6 +17,7 @@ A Python utility for parsing complex search phrases and converting them into Dja
 
 - Python 3.8 or higher.
 - Django installed in your environment.
+- pytest additional dependencies for testing
 
 ## How to use
 
@@ -27,4 +28,11 @@ search_phrase = "(date eq 2023-01-01) AND ((distance gt 20) OR (distance lt 10))
 
 parser = SearchParser(allowed_fields)
 search_filter = parser.parse(search_phrase)
+```
 
+## Testing
+
+To validate the functionality of the `SearchParser`. The tests ensure correct handling of:
+- Logical operators (`AND`, `OR`)
+- Comparison operators (`eq`, `ne`, `gt`, `lt`)
+- Nested conditions and parentheses

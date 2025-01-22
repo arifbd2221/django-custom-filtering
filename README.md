@@ -18,9 +18,9 @@ A Python utility for parsing complex search phrases and converting them into Dja
 - Python 3.8 or higher.
 - Django installed in your environment.
 
-## File Structure
+## How to use
 
-```How to use
+```python
 from filtering import SearchParser
 allowed_fields = ['date', 'distance']
 search_phrase = "(date eq 2023-01-01) AND ((distance gt 20) OR (distance lt 10))"

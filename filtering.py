@@ -18,6 +18,15 @@ class SearchParser:
 
     def evaluate_expression(self, expression):
         field, operator, value = re.split(r'\s+', expression, 2)
+
+        # Validate the field
+        if field not in self.allowed_fields:
+            raise ValueError(f"Field '{field}' is not allowed.")
+
+        # Map the operator to its Django ORM equivalent
+        if operator.lower() not in self.operator_mapping:
+            raise ValueError(f"Operator '{operator}' is not supported.")
+
         lookup = self.operator_mapping[operator.lower()]
         return Q(**{f"{field}{lookup}": value})
 
